@@ -1,142 +1,136 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plyr Ultimate Fix</title>
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f0f2f5;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Annotator (YT & Vimeo)</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <style>
+        :root { --primary: #00b3ff; --bg: #f4f7f9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .video-wrapper { width: 100%; max-width: 1000px; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px; }
 
-    .controls {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 1000px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+        .table-container { width: 100%; max-width: 1000px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; color: #64748b; padding: 15px; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        tr:hover { background: #fdfdfd; }
 
-    input {
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      flex: 1;
-      min-width: 250px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 12px 24px;
-      background: #00b3ff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .video-wrapper {
-      width: 100%;
-      max-width: 1100px;
-      background: #000;
-      border-radius: 12px;
-      overflow: hidden;
-      aspect-ratio: 16 / 9;
-    }
-  </style>
+        .btn-play { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: transform 0.1s; }
+        .btn-play:active { transform: scale(0.95); }
+        
+        /* Utility per nascondere Dailymotion API in futuro */
+        .hidden { display: none; }
+    </style>
 </head>
-
 <body>
-  <div class="controls">
-    <input type="text" id="videoUrl" placeholder="URL YouTube o Dailymotion">
-    <input type="number" id="seekTime" placeholder="Sec" value="0">
-    <button onclick="loadVideo()">CARICA VIDEO</button>
-  </div>
-  V2
-  <div class="video-wrapper">
-    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="aqz-KE-bpKQ"></div>
-  </div>
-  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-  <script>
-    // 1. Inizializzazione con controlli essenziali
-    const player = new Plyr('#player', {
-      invertTime: false,
-      displayDuration: true,
-      controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
-      // Forza Dailymotion a riconoscere l'origine
-      vimeo: { referrerPolicy: 'no-referrer-when-downgrade' }
-    });
 
-    function extractVideoId(url) {
-      if (url.includes('youtube.com') || url.includes('youtu.be')) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
-        return { id: (match && match[2].length === 11) ? match[2] : null, provider: 'youtube' };
-      }
-      if (url.includes('dailymotion.com') || url.includes('dai.ly')) {
-        // Regex più aggressiva per Dailymotion
-        const regExp = /(?:dailymotion\.com(?:\/video\/|\/embed\/)|dai\.ly\/)([a-zA-Z0-9]+)/;
-        const match = url.match(regExp);
-        return { id: (match && match[1]) ? match[1] : null, provider: 'dailymotion' };
-      }
-      return { id: null, provider: null };
-    }
+    <div class="video-wrapper">
+        <div id="player-container">
+            <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="aqz-KE-bpKQ"></div>
+        </div>
+    </div>
 
-    function loadVideo() {
-      const rawUrl = document.getElementById('videoUrl').value;
-      const time = parseInt(document.getElementById('seekTime').value) || 0;
-      const info = extractVideoId(rawUrl);
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Indice</th>
+                    <th>Commento</th>
+                    <th>Url Video</th>
+                    <th>Time (sec)</th>
+                    <th>Azione</th>
+                </tr>
+            </thead>
+            <tbody id="video-table-body">
+                <tr>
+                    <td>1</td>
+                    <td>Introduzione tecnica</td>
+                    <td class="video-url">https://www.youtube.com/watch?v=aqz-KE-bpKQ</td>
+                    <td class="video-time">15</td>
+                    <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Demo Vimeo (Esempio)</td>
+                    <td class="video-url">https://vimeo.com/76979871</td>
+                    <td class="video-time">45</td>
+                    <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Punto specifico YT</td>
+                    <td class="video-url">https://www.youtube.com/watch?v=aqz-KE-bpKQ</td>
+                    <td class="video-time">120</td>
+                    <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-      if (!info.id) {
-        alert("URL non riconosciuto");
-        return;
-      }
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script>
+        let player;
+        let currentVideoId = "aqz-KE-bpKQ"; // ID iniziale di default
+        
+        const plyrConfig = {
+            invertTime: false,
+            displayDuration: true,
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen']
+        };
 
-      // RESET: Prima di cambiare sorgente, fermiamo il player attuale
-      player.stop();
+        // Inizializzazione
+        player = new Plyr('#player', plyrConfig);
 
-      player.source = {
-        type: 'video',
-        sources: [{
-          src: info.id,
-          provider: info.provider,
-        }],
-      };
-
-      // LOGICA DI ATTESA SPECIFICA PER DAILYMOTION
-      const checkReady = setInterval(() => {
-        if (player.ready) {
-          clearInterval(checkReady);
-
-          // Dailymotion richiede spesso un play() iniziale per "svegliarsi"
-          player.play().then(() => {
-            setTimeout(() => {
-              player.currentTime = time;
-            }, 1000);
-          }).catch(() => {
-            // Se l'autoplay è bloccato, proviamo comunque il seek
-            player.currentTime = time;
-          });
+        function extractInfo(url) {
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+                return { id: (match && match[2].length === 11) ? match[2] : null, provider: 'youtube' };
+            }
+            if (url.includes('vimeo.com')) {
+                const match = url.match(/(?:vimeo\.com\/)(\d+)/);
+                return { id: (match && match[1]) ? match[1] : null, provider: 'vimeo' };
+            }
+            // Spazio per Dailymotion API in futuro
+            return null;
         }
-      }, 200);
 
-      // Timeout di sicurezza dopo 10 secondi
-      setTimeout(() => clearInterval(checkReady), 10000);
-    }
-  </script>
+        function handleRowPlay(button) {
+            const row = button.closest('tr');
+            const url = row.querySelector('.video-url').innerText.trim();
+            const time = parseInt(row.querySelector('.video-time').innerText.trim()) || 0;
+            const info = extractInfo(url);
+
+            if (!info) return;
+
+            // Se il video è già caricato, fai solo il seek
+            if (info.id === currentVideoId) {
+                console.log("Stesso video, eseguo il seek...");
+                player.currentTime = time;
+                player.play();
+            } 
+            // Se il video è diverso, caricalo e poi fai il seek
+            else {
+                console.log("Nuovo video, ricarico player...");
+                currentVideoId = info.id;
+                loadNewSource(info.provider, info.id, time);
+            }
+        }
+
+        function loadNewSource(provider, id, time) {
+            player.destroy();
+            document.getElementById('player-container').innerHTML = `<div id="player" data-plyr-provider="${provider}" data-plyr-embed-id="${id}"></div>`;
+            
+            player = new Plyr('#player', plyrConfig);
+
+            player.on('ready', () => {
+                setTimeout(() => {
+                    player.currentTime = time;
+                    player.play();
+                }, 1000); // Delay di sicurezza per negoziazione API
+            });
+        }
+    </script>
 </body>
-
 </html>
