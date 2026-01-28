@@ -3,83 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Annotator - YT & Vimeo</title>
+    <title>Dynamic JSON Video Player</title>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         :root { --primary: #00b3ff; --bg: #f4f7f9; --highlight: #e0f4ff; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .video-wrapper { width: 100%; max-width: 1000px; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px; }
-
-        .table-container { width: 100%; max-width: 1000px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; color: #64748b; padding: 15px; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #1e293b; transition: all 0.3s; }
-        
-        /* Classe per evidenziare la riga attiva */
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .main-layout { display: flex; flex-direction: column; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .video-column { flex: 2; min-width: 0; }
+        .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .table-column { flex: 1; min-width: 300px; }
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-height: 85vh; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: #f8fafc; color: #64748b; padding: 12px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
         tr.active-row td { background-color: var(--highlight); font-weight: bold; color: var(--primary); }
+        .btn-play { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .status-msg { padding: 20px; text-align: center; color: #64748b; }
 
-        .btn-play { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-play:active { transform: scale(0.95); }
+        @media (min-width: 992px) or (orientation: landscape) and (min-height: 500px) {
+            .main-layout { flex-direction: row; align-items: flex-start; padding-top: 20px; }
+            .table-column { order: 1; max-width: 450px; }
+            .video-column { order: 2; position: sticky; top: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="video-wrapper">
-        <div id="player-container">
-            <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="aqz-KE-bpKQ"></div>
+    <div class="main-layout">
+        <div class="table-column">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Commento</th>
+                            <th>Time</th>
+                            <th>Play</th>
+                        </tr>
+                    </thead>
+                    <tbody id="video-table-body">
+                        </tbody>
+                </table>
+                <div id="loader" class="status-msg">Caricamento dati...</div>
+            </div>
         </div>
-    </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Indice</th>
-                    <th>Commento</th>
-                    <th>Url Video</th>
-                    <th>Time (sec)</th>
-                    <th>Azione</th>
-                </tr>
-            </thead>
-            <tbody id="video-table-body">
-                <tr>
-                    <td>1</td>
-                    <td>Intro YouTube</td>
-                    <td class="video-url">https://www.youtube.com/watch?v=aqz-KE-bpKQ</td>
-                    <td class="video-time">10</td>
-                    <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Test Vimeo (Autoplay Fix)</td>
-                    <td class="video-url">https://vimeo.com/76979871</td>
-                    <td class="video-time">30</td>
-                    <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Secondo punto YouTube</td>
-                    <td class="video-url">https://www.youtube.com/watch?v=aqz-KE-bpKQ</td>
-                    <td class="video-time">150</td>
-                    <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="video-column">
+            <div class="video-wrapper">
+                <div id="player-container">
+                    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="aqz-KE-bpKQ"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script>
         let player;
-        let currentVideoId = "aqz-KE-bpKQ";
-        
-        const plyrConfig = {
-            invertTime: false,
-            displayDuration: true,
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen']
-        };
+        let currentVideoId = "";
+        const plyrConfig = { invertTime: false, displayDuration: true, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'] };
 
+        // 1. Inizializzazione Player Vuoto o Default
         player = new Plyr('#player', plyrConfig);
+
+        // 2. Leggi parametri URL
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const jsonUrl = params.get('src');
+
+            if (!jsonUrl) {
+                document.getElementById('loader').innerText = "Errore: parametro 'src' mancante nella URL.";
+                return;
+            }
+
+            try {
+                const response = await fetch(jsonUrl);
+                if (!response.ok) throw new Error("File non trovato");
+                const data = await response.json();
+                buildTable(data);
+                document.getElementById('loader').style.display = 'none';
+            } catch (err) {
+                document.getElementById('loader').innerText = "Errore nel caricamento del file JSON.";
+                console.error(err);
+            }
+        }
+
+        // 3. Costruisci Tabella
+        function buildTable(data) {
+            const tbody = document.getElementById('video-table-body');
+            tbody.innerHTML = ""; // Pulisce
+
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.indice || index + 1}</td>
+                    <td>${item.commento}</td>
+                    <td class="video-time">${item.time}</td>
+                    <td><button class="btn-play" onclick="handleRowPlay(this, '${item.url}')">▶</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
         function extractInfo(url) {
             if (url.includes('youtube.com') || url.includes('youtu.be')) {
@@ -93,20 +117,15 @@
             return null;
         }
 
-        function highlightRow(activeRow) {
-            document.querySelectorAll('tr').forEach(row => row.classList.remove('active-row'));
-            activeRow.classList.add('active-row');
-        }
-
-        function handleRowPlay(button) {
+        function handleRowPlay(button, url) {
             const row = button.closest('tr');
-            const url = row.querySelector('.video-url').innerText.trim();
             const time = parseInt(row.querySelector('.video-time').innerText.trim()) || 0;
             const info = extractInfo(url);
 
             if (!info) return;
 
-            highlightRow(row);
+            document.querySelectorAll('tr').forEach(r => r.classList.remove('active-row'));
+            row.classList.add('active-row');
 
             if (info.id === currentVideoId) {
                 player.currentTime = time;
@@ -120,26 +139,17 @@
         function loadNewSource(provider, id, time) {
             player.destroy();
             document.getElementById('player-container').innerHTML = `<div id="player" data-plyr-provider="${provider}" data-plyr-embed-id="${id}"></div>`;
-            
             player = new Plyr('#player', plyrConfig);
-
             player.on('ready', () => {
                 setTimeout(() => {
                     player.currentTime = time;
-                    
-                    // Tentativo di autoplay forzato
-                    const playPromise = player.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(() => {
-                            // Se fallisce, mutiamo e riproviamo (metodo garantito per i browser)
-                            player.muted = true;
-                            player.play();
-                            console.log("Autoplay avviato in modalità Muted");
-                        });
-                    }
+                    const p = player.play();
+                    if (p !== undefined) p.catch(() => { player.muted = true; player.play(); });
                 }, 1200);
             });
         }
+
+        window.onload = init;
     </script>
 </body>
 </html>
