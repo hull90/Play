@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Annotator (YT & Vimeo)</title>
+    <title>Video Annotator - YT & Vimeo</title>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
-        :root { --primary: #00b3ff; --bg: #f4f7f9; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        :root { --primary: #00b3ff; --bg: #f4f7f9; --highlight: #e0f4ff; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
         .video-wrapper { width: 100%; max-width: 1000px; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px; }
 
         .table-container { width: 100%; max-width: 1000px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { background: #f8fafc; color: #64748b; padding: 15px; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
-        tr:hover { background: #fdfdfd; }
-
-        .btn-play { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: transform 0.1s; }
-        .btn-play:active { transform: scale(0.95); }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #1e293b; transition: all 0.3s; }
         
-        /* Utility per nascondere Dailymotion API in futuro */
-        .hidden { display: none; }
+        /* Classe per evidenziare la riga attiva */
+        tr.active-row td { background-color: var(--highlight); font-weight: bold; color: var(--primary); }
+
+        .btn-play { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-play:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -46,23 +45,23 @@
             <tbody id="video-table-body">
                 <tr>
                     <td>1</td>
-                    <td>Introduzione tecnica</td>
+                    <td>Intro YouTube</td>
                     <td class="video-url">https://www.youtube.com/watch?v=aqz-KE-bpKQ</td>
-                    <td class="video-time">15</td>
+                    <td class="video-time">10</td>
                     <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
                 </tr>
                 <tr>
                     <td>2</td>
-                    <td>Demo Vimeo (Esempio)</td>
+                    <td>Test Vimeo (Autoplay Fix)</td>
                     <td class="video-url">https://vimeo.com/76979871</td>
-                    <td class="video-time">45</td>
+                    <td class="video-time">30</td>
                     <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
                 </tr>
                 <tr>
                     <td>3</td>
-                    <td>Punto specifico YT</td>
+                    <td>Secondo punto YouTube</td>
                     <td class="video-url">https://www.youtube.com/watch?v=aqz-KE-bpKQ</td>
-                    <td class="video-time">120</td>
+                    <td class="video-time">150</td>
                     <td><button class="btn-play" onclick="handleRowPlay(this)">▶ PLAY</button></td>
                 </tr>
             </tbody>
@@ -72,7 +71,7 @@
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script>
         let player;
-        let currentVideoId = "aqz-KE-bpKQ"; // ID iniziale di default
+        let currentVideoId = "aqz-KE-bpKQ";
         
         const plyrConfig = {
             invertTime: false,
@@ -80,7 +79,6 @@
             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen']
         };
 
-        // Inizializzazione
         player = new Plyr('#player', plyrConfig);
 
         function extractInfo(url) {
@@ -92,8 +90,12 @@
                 const match = url.match(/(?:vimeo\.com\/)(\d+)/);
                 return { id: (match && match[1]) ? match[1] : null, provider: 'vimeo' };
             }
-            // Spazio per Dailymotion API in futuro
             return null;
+        }
+
+        function highlightRow(activeRow) {
+            document.querySelectorAll('tr').forEach(row => row.classList.remove('active-row'));
+            activeRow.classList.add('active-row');
         }
 
         function handleRowPlay(button) {
@@ -104,15 +106,12 @@
 
             if (!info) return;
 
-            // Se il video è già caricato, fai solo il seek
+            highlightRow(row);
+
             if (info.id === currentVideoId) {
-                console.log("Stesso video, eseguo il seek...");
                 player.currentTime = time;
                 player.play();
-            } 
-            // Se il video è diverso, caricalo e poi fai il seek
-            else {
-                console.log("Nuovo video, ricarico player...");
+            } else {
                 currentVideoId = info.id;
                 loadNewSource(info.provider, info.id, time);
             }
@@ -127,8 +126,18 @@
             player.on('ready', () => {
                 setTimeout(() => {
                     player.currentTime = time;
-                    player.play();
-                }, 1000); // Delay di sicurezza per negoziazione API
+                    
+                    // Tentativo di autoplay forzato
+                    const playPromise = player.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => {
+                            // Se fallisce, mutiamo e riproviamo (metodo garantito per i browser)
+                            player.muted = true;
+                            player.play();
+                            console.log("Autoplay avviato in modalità Muted");
+                        });
+                    }
+                }, 1200);
             });
         }
     </script>
