@@ -19,11 +19,9 @@ async function init() {
         let root;
         // Rilevamento automatico Gzip (1f 8b) o JSON
         if (uint8View[0] === 0x1f && uint8View[1] === 0x8b) {
-            console.log("Decoding Gzip data...");
             const charData = pako.ungzip(uint8View, { to: 'string' });
             root = JSON.parse(charData);
         } else {
-            console.log("Decoding Standard JSON...");
             root = JSON.parse(new TextDecoder("utf-8").decode(uint8View));
         }
 
@@ -32,9 +30,15 @@ async function init() {
         allData = root.markerInstanceList || [];
         renderTable(allData);
         generateFilterUI();
+        
+        // FIX Firefox Android: Abilita scroll passivo
+        const scrollEl = document.querySelector('.dataTables_scrollBody');
+        if(scrollEl) {
+            scrollEl.addEventListener('touchstart', function() {}, {passive: true});
+        }
+
     } catch (err) { 
         console.error("Data Error:", err);
-        alert("Errore nel caricamento del file.");
     }
 }
 
@@ -47,7 +51,19 @@ function renderTable(data) {
     });
 
     if ($.fn.DataTable.isDataTable('#videoTable')) table.destroy();
-    table = $('#videoTable').DataTable({ paging: false, info: false, dom: 'rt', scrollY: '100%', scrollCollapse: true, columnDefs: [{ targets: 0, orderable: false }], order: [[0, 'asc']] });
+    
+    table = $('#videoTable').DataTable({ 
+        paging: false, 
+        info: false, 
+        dom: 'rt', 
+        scrollY: $(window).width() > 991 ? '100%' : '350px', 
+        scrollCollapse: true, 
+        scrollX: true,
+        columnDefs: [{ targets: 0, orderable: false }], 
+        order: [[0, 'asc']],
+        autoWidth: false
+    });
+
     table.on('order.dt search.dt', function () {
         table.column(0, {search:'applied', order:'applied'}).nodes().each((cell, i) => cell.innerHTML = i + 1);
         updateResetVisibility();
@@ -137,5 +153,12 @@ $(window).on('click', e => {
     if (!$(e.target).closest('.nav-right').length) $('#navMenu').removeClass('open');
     if ($(e.target).hasClass('modal')) $('.modal').hide();
 });
-$(window).on('resize', () => { if ($(window).width() > 991) $('#navMenu').removeClass('open'); });
+$(window).on('resize', () => { 
+    if ($(window).width() > 991) $('#navMenu').removeClass('open'); 
+    // Aggiorna altezza DataTable al resize
+    if(table) {
+        const newH = $(window).width() > 991 ? '100%' : '350px';
+        $('.dataTables_scrollBody').css('height', newH);
+    }
+});
 $(document).ready(init);
