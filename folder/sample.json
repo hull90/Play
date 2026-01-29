@@ -1,0 +1,138 @@
+{
+  "name": "DAY2_C_ITA_SRB",
+  "date": "Jan 27, 2026, 10:44:51 AM",
+  "lastSaveDate": "Jan 27, 2026, 1:59:24 PM",
+  "sport": "waterpolo",
+  "language": "italiano",
+  "description": "",
+  "event": {
+    "sport": "waterpolo",
+    "name": "DAY2_C_ITA_SRB",
+    "date": "Jan 27, 2026, 10:44:51 AM",
+    "team1Trainer": "",
+    "team2Trainer": "",
+    "place": "",
+    "team1": "ITA_FUN26",
+    "team1Color": {
+      "value": -1,
+      "falpha": 0.0
+    },
+    "team2": "SRB_FUN26",
+    "team2Color": {
+      "value": -15461296,
+      "falpha": 0.0
+    },
+    "team1Players": {
+      "1": "CONDORELLI",
+      "2": "TABANI",
+      "3": "LEONE",
+      "4": "BACELLE",
+      "6": "CERGOL",
+      "7": "GIUSTINI",
+      "8": "BIANCONI",
+      "9": "MARLETTA",
+      "10": "RANALLI",
+      "11": "COCCHIERE",
+      "12": "BETTINI",
+      "13": "SANTAPAOLA",
+      "14": "PAPI",
+      "15": "MEGGIATO"
+    },
+    "team2Players": {
+      "1": "TRAVAR",
+      "3": "ZELIC",
+      "4": "MILICEVIC",
+      "5": "SARAC",
+      "6": "RADONJIC",
+      "7": "ILIC",
+      "8": "MANDIC",
+      "9": "DIAZ MESA",
+      "10": "VUKOVIC",
+      "11": "CUK",
+      "12": "LUKIC",
+      "13": "DULIC",
+      "14": "CUK",
+      "15": "RATKOVIC"
+    },
+    "notes": "",
+    "tournament": "",
+    "finalScore": "",
+    "defaultPlayersCount": 14,
+    "listPeriodValues": [
+      "1-Primo tempo",
+      "2-Secondo tempo",
+      "3-Terzo tempo",
+      "4-Quarto tempo",
+      "5-Primo tempo supplementare",
+      "6-Secondo tempo supplementare",
+      "7-Rigori"
+    ]
+  },
+  "liveAnalysis": false,
+  "softwareVersion": "1.61.0",
+  "eventMarkerList": [
+  ],
+  "markerInstanceList": [
+    {
+      "uid": 43811769522364661,
+      "time": 20560,
+      "videoPathAssociated": "C:\\Stagione Nazionale 2025-26\\2026 - Funchal EC\\DAY2_C_ITA_SRB\\ita-srb.mp4",
+      "videoTimeAssociated": 21934,
+      "valueMap": {
+        "Periodo": "1-Primo tempo"
+      },
+      "name": "INIZIO PERIODO",
+      "shortName": "IP"
+    },
+    {
+      "uid": 539081769522364661,
+      "extraNotes": "{\"a\":\"DAY2_C_ITA_SRB\",\"b\":\"Jan 27, 2026, 10:44:51 AM\",\"c\":\"ITA\",\"e\":\"#1\"}",
+      "time": 28757,
+      "videoPathAssociated": "C:\\Stagione Nazionale 2025-26\\2026 - Funchal EC\\DAY2_C_ITA_SRB\\ita-srb.mp4",
+      "videoTimeAssociated": 30131,
+      "valueMap": {
+        "Azione completa": "Si",
+        "Esito": "Gol",
+        "Squadra difesa": "SRB_FUN26",
+        "Periodo": "1-Primo tempo",
+        "Squadra attacco": "ITA_FUN26"
+      },
+      "name": "ATTACCO",
+      "shortName": "AT"
+    },
+    {
+      "uid": 332151769522364661,
+      "extraNotes": "{\"a\":\"DAY2_C_ITA_SRB\",\"b\":\"Jan 27, 2026, 10:44:51 AM\",\"c\":\"ITA\",\"e\":\"#1\"}",
+      "time": 57469,
+      "videoPathAssociated": "C:\\Stagione Nazionale 2025-26\\2026 - Funchal EC\\DAY2_C_ITA_SRB\\ita-srb.mp4",
+      "videoTimeAssociated": 58843,
+      "valueMap": {
+        "Squadra difesa": "SRB_FUN26",
+        "Periodo": "1-Primo tempo",
+        "Squadra attacco": "ITA_FUN26"
+      },
+      "name": "ASSIST",
+      "shortName": "AS"
+    },
+    {
+      "uid": 536351769522364661,
+      "extraNotes": "{\"a\":\"DAY2_C_ITA_SRB\",\"b\":\"Jan 27, 2026, 10:44:51 AM\",\"c\":\"ITA\",\"d\":\"GIUSTINI\",\"e\":\"1:0 (1/1)\"}",
+      "time": 58110,
+      "videoPathAssociated": "C:\\Stagione Nazionale 2025-26\\2026 - Funchal EC\\DAY2_C_ITA_SRB\\ita-srb.mp4",
+      "videoTimeAssociated": 59484,
+      "valueMap": {
+        "Distanza": "2.3 M",
+        "Coordinate": "-2.3,-1.0,0.6,-0.7",
+        "Giocatore attacco": "GIUSTINI",
+        "Specchio della porta": "Basso sinistra",
+        "Informazioni": "In parita\u0027",
+        "Squadra difesa": "SRB_FUN26",
+        "Periodo": "1-Primo tempo",
+        "Tiro partito da": "Da posizione 6",
+        "Squadra attacco": "ITA_FUN26"
+      },
+      "name": "GOL",
+      "shortName": "GL"
+    }
+  ]
+}

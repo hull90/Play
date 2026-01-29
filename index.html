@@ -3,64 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Lab - Advanced Filters</title>
-    
+    <title>Video Lab Pro - Match Analysis</title>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" />
-    
     <style>
-        :root { --primary: #00b3ff; --bg: #f4f7f9; --highlight: #e0f4ff; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 0; overflow: hidden; }
+        :root { --primary: #00b3ff; --bg: #f4f7f9; --highlight: #e0f4ff; --dark: #1e293b; --topbar-h: 60px; }
+        html, body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); height: 100vh; overflow: hidden; }
 
-        .main-layout { display: flex; flex-direction: row-reverse; gap: 20px; padding: 20px; height: 100vh; box-sizing: border-box; }
-        .video-column { flex: 2; min-width: 0; }
-        .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: sticky; top: 0; }
-        .table-column { flex: 0 0 450px; min-width: 350px; display: flex; flex-direction: column; background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-y: auto; }
+        /* Topbar */
+        .top-nav { height: var(--topbar-h); background: var(--dark); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; position: fixed; top: 0; width: 100%; z-index: 1001; box-sizing: border-box; }
+        .nav-left { display: flex; align-items: baseline; gap: 10px; overflow: hidden; flex: 1; min-width: 0; }
+        .nav-left h1 { margin: 0; font-size: 1rem; font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-left h1 b { color: var(--primary); }
+        #event-date { opacity: 0.6; font-size: 0.75rem; white-space: nowrap; }
 
-        /* Stile DataTables */
-        table.dataTable { font-size: 0.85rem; border-bottom: none !important; }
-        table.dataTable tbody tr.active-row td { background-color: var(--highlight) !important; font-weight: bold; border-left: 4px solid var(--primary); }
-        .btn-play { background: var(--primary); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; }
+        
+        #globalResetBtn { display: none; background: #334155; color: var(--primary); border: 1px solid var(--primary); padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .btn-icon { background: #334155; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; }
+        .hamburger { display: block; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+
+        .nav-menu { display: flex; align-items: center; gap: 10px; }
 
         @media (max-width: 991px) {
-            .main-layout { flex-direction: column; height: auto; overflow: visible; }
-            body { overflow: visible; }
-            .table-column { flex: none; width: 100%; max-width: 100%; height: auto; }
+            .nav-menu { display: none; position: absolute; top: var(--topbar-h); right: 0; background: var(--dark); flex-direction: column; width: 180px; padding: 15px; box-shadow: -5px 5px 15px rgba(0,0,0,0.3); border-radius: 0 0 0 12px; }
+            .nav-menu.open { display: flex !important; }
+            .control-unit { flex-direction: column; align-items: flex-start; gap: 5px; width: 100%; border-bottom: 1px solid #334155; padding-bottom: 10px; }
         }
+
+        @media (min-width: 992px) {
+            .hamburger { display: none !important; }
+            .nav-menu { display: flex !important; position: static; background: none; padding: 0; width: auto; box-shadow: none; flex-direction: row; }
+            .top-nav { padding: 0 20px; }
+        }
+
+        .main-layout { display: flex; flex-direction: column; gap: 20px; padding: 15px; margin-top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); box-sizing: border-box; }
+        @media (min-width: 992px) { .main-layout { flex-direction: row-reverse; padding: 20px; } .video-column { flex: 2; } .table-column { flex: 0 0 450px; display: flex; flex-direction: column; } }
+
+        .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; }
+        .table-column { background: white; border-radius: 12px; padding: 15px; overflow: hidden; }
+        .table-container-scroll { flex: 1; overflow: hidden; }
+
+        .dataTables_filter, .dataTables_info { display: none !important; }
+        table.dataTable tbody tr.active-row td { background-color: var(--highlight) !important; color: var(--primary); font-weight: bold; border-left: 4px solid var(--primary); }
+        
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; }
+        .control-unit { display: flex; align-items: center; gap: 8px; }
+        .control-unit input { width: 40px; background: #334155; border: 1px solid #475569; color: white; padding: 4px; border-radius: 4px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="main-layout">
-        <div class="video-column">
-            <div class="video-wrapper">
-                <div id="player-container">
-                    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="aqz-KE-bpKQ"></div>
-                </div>
+    <nav class="top-nav">
+        <div class="nav-left">
+            <h1 id="main-title">VIDEO<b>LAB</b></h1>
+            <span id="event-date">...</span>
+        </div>
+        <div class="nav-right">
+            <button id="globalResetBtn" onclick="resetAll()">🧹</button>
+            <button id="playBtn" class="btn-main">▶ PLAY</button>
+            <button class="hamburger" onclick="toggleMobileMenu(event)">☰</button>
+            <div class="nav-menu" id="navMenu">
+                <div class="control-unit"><label style="font-size:0.6rem; color:#94a3b8;">OFFSET</label><input type="number" id="offsetSeconds" value="0"></div>
+                <button class="btn-icon" onclick="toggleModal('filterModal', true); $('#navMenu').removeClass('open');">🔍 FILTRI</button>
+                <button id="detailsBtn" class="btn-main" style="background:#64748b; opacity: 0.2; pointer-events: none;">📄 INFO</button>
             </div>
         </div>
+    </nav>
 
-        <div class="table-column">
-            <table id="videoTable" class="display responsive nowrap" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Commento</th>
-                        <th>Sec</th>
-                        <th>Play</th>
-                    </tr>
-                </thead>
-                <tbody id="video-table-body">
-                    </tbody>
-            </table>
-        </div>
+    <div class="main-layout">
+        <div class="video-column"><div class="video-wrapper"><div id="player-container"><div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div></div></div></div>
+        <div class="table-column"><div class="table-container-scroll"><table id="videoTable" class="display nowrap" style="width:100%"><thead><tr><th>#</th><th>Evento</th><th>Player</th><th>Team</th><th>Per</th></tr></thead><tbody id="video-table-body"></tbody></table></div></div>
     </div>
 
+    <div id="filterModal" class="modal"><div class="modal-content"><h3>Filtri</h3><div id="filter-container"></div><div style="text-align:right; margin-top:20px;"><button class="btn-icon" style="background:#ef4444; display:inline-block; margin-right:5px;" onclick="resetFilters()">Reset</button><button class="btn-icon" style="background:var(--primary); display:inline-block;" onclick="applyFilters()">Applica</button></div></div></div>
+    <div id="detailsModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between;"><h3>Dettagli</h3><button onclick="toggleModal('detailsModal', false)" style="border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button></div><div id="details-container"></div></div></div>
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
     <script src="script.js"></script>
 </body>
 </html>
