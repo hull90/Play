@@ -11,7 +11,7 @@
         
         html, body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); height: 100vh; width: 100vw; overflow: hidden; }
 
-        /* Topbar */
+        /* Topbar Rigida */
         .top-nav { height: var(--topbar-h); background: var(--dark); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; position: fixed; top: 0; width: 100%; z-index: 1001; box-sizing: border-box; }
         .nav-left { display: flex; align-items: baseline; gap: 10px; overflow: hidden; flex: 1; min-width: 0; }
         .nav-left h1 { margin: 0; font-size: 1rem; font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -27,41 +27,65 @@
 
         .nav-menu { display: flex; align-items: center; gap: 10px; }
 
-        /* Layout Main */
-        .main-layout { display: flex; flex-direction: column; gap: 20px; padding: 15px; margin-top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); box-sizing: border-box; }
+        /* --- Layout Dinamico --- */
+        .main-layout { display: flex; flex-direction: column; gap: 15px; padding: 10px; margin-top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); box-sizing: border-box; }
 
-        /* FIX SCROLL TOUCH: Firefox/Mobile */
-        .table-container-scroll, .dataTables_scrollBody {
-            -webkit-overflow-scrolling: touch !important;
-            overflow-y: auto !important;
-            touch-action: pan-y !important;
+        .video-column { flex-shrink: 0; width: 100%; }
+        .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+
+        .table-column { 
+            background: white; border-radius: 12px; padding: 10px; 
+            flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Forza lo scroll indipendente della tabella */
+        .table-container-scroll { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .dataTables_wrapper { height: 100%; display: flex; flex-direction: column; }
+        .dataTables_scroll { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .dataTables_scrollBody { 
+            flex: 1 !important; 
+            -webkit-overflow-scrolling: touch !important; 
+            touch-action: pan-x pan-y !important;
         }
 
-        @media (max-width: 991px) {
-            html, body { overflow-y: auto !important; height: auto !important; position: relative; }
-            .main-layout { height: auto; display: block; padding-bottom: 50px; }
+        /* --- Mobile Portrait (Verticale) --- */
+        @media (max-width: 991px) and (orientation: portrait) {
             .nav-menu { display: none; position: absolute; top: var(--topbar-h); right: 0; background: var(--dark); flex-direction: column; width: 180px; padding: 15px; box-shadow: -5px 5px 15px rgba(0,0,0,0.3); border-radius: 0 0 0 12px; }
             .nav-menu.open { display: flex !important; }
-            .table-column { height: 60vh; min-height: 400px; margin-top: 20px; background: white; border-radius: 12px; padding: 10px; }
-            .video-column { width: 100%; }
+            .control-unit { flex-direction: column; align-items: flex-start; gap: 5px; width: 100%; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+            table.dataTable tbody td { padding: 12px 8px !important; font-size: 0.75rem; }
         }
 
+        /* --- Mobile Landscape (Orizzontale) --- */
+        @media (max-width: 991px) and (orientation: landscape) {
+            .main-layout { flex-direction: row; gap: 10px; padding: 5px; }
+            .video-column { flex: 1.2; } /* Video leggermente più grande */
+            .table-column { flex: 1; }
+            .top-nav { height: 45px; } /* Risparmiamo spazio verticale */
+            :root { --topbar-h: 45px; }
+            .nav-menu { width: 150px; }
+        }
+
+        /* --- Desktop --- */
         @media (min-width: 992px) {
             .hamburger { display: none !important; }
             .nav-menu { display: flex !important; position: static; background: none; padding: 0; width: auto; box-shadow: none; flex-direction: row; }
-            .main-layout { flex-direction: row-reverse; padding: 20px; } 
+            .main-layout { flex-direction: row-reverse; padding: 20px; gap: 20px; } 
             .video-column { flex: 2; } 
-            .table-column { flex: 0 0 450px; background: white; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
+            .table-column { flex: 0 0 450px; padding: 15px; }
+            .top-nav { padding: 0 20px; }
         }
 
-        .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; }
-        .table-container-scroll { flex: 1; overflow: hidden; }
-
-        .dataTables_filter, .dataTables_info { display: none !important; }
+        /* Styling Tabella Finale */
+        table.dataTable thead th { font-size: 0.65rem; padding: 10px 8px !important; white-space: nowrap; background: #f8fafc; }
+        table.dataTable tbody td { white-space: nowrap; border-bottom: 1px solid #f1f5f9 !important; }
         table.dataTable tbody tr.active-row td { background-color: var(--highlight) !important; color: var(--primary); font-weight: bold; border-left: 4px solid var(--primary); }
         
+        .dataTables_filter, .dataTables_info, .dataTables_paginate { display: none !important; }
+        
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: white; margin: 10% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; }
         .control-unit { display: flex; align-items: center; gap: 8px; }
         .control-unit input { width: 45px; background: #334155; border: 1px solid #475569; color: white; padding: 4px; border-radius: 4px; text-align: center; }
     </style>
@@ -86,8 +110,21 @@
     </nav>
 
     <div class="main-layout">
-        <div class="video-column"><div class="video-wrapper"><div id="player-container"><div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div></div></div></div>
-        <div class="table-column"><div class="table-container-scroll"><table id="videoTable" class="display nowrap" style="width:100%"><thead><tr><th>#</th><th>Evento</th><th>Player</th><th>Team</th><th>Per</th></tr></thead><tbody id="video-table-body"></tbody></table></div></div>
+        <div class="video-column">
+            <div class="video-wrapper">
+                <div id="player-container"><div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div></div>
+            </div>
+        </div>
+        <div class="table-column">
+            <div class="table-container-scroll">
+                <table id="videoTable" class="display nowrap" style="width:100%">
+                    <thead>
+                        <tr><th>#</th><th>Evento</th><th>Player</th><th>Team</th><th>Per</th></tr>
+                    </thead>
+                    <tbody id="video-table-body"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div id="filterModal" class="modal"><div class="modal-content"><h3>Filtri</h3><div id="filter-container"></div><div style="text-align:right; margin-top:20px;"><button class="btn-icon" style="background:#ef4444; display:inline-block; margin-right:5px;" onclick="resetFilters()">Reset</button><button class="btn-icon" style="background:var(--primary); display:inline-block;" onclick="applyFilters()">Applica</button></div></div></div>

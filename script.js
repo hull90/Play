@@ -17,10 +17,8 @@ async function init() {
         const uint8View = new Uint8Array(arrayBuffer);
         
         let root;
-        // Rilevamento automatico Gzip (1f 8b) o JSON
         if (uint8View[0] === 0x1f && uint8View[1] === 0x8b) {
-            const charData = pako.ungzip(uint8View, { to: 'string' });
-            root = JSON.parse(charData);
+            root = JSON.parse(pako.ungzip(uint8View, { to: 'string' }));
         } else {
             root = JSON.parse(new TextDecoder("utf-8").decode(uint8View));
         }
@@ -31,15 +29,11 @@ async function init() {
         renderTable(allData);
         generateFilterUI();
         
-        // FIX Firefox Android: Abilita scroll passivo
+        // Fix per attivare lo scroll nativo su Firefox/Chrome Android
         const scrollEl = document.querySelector('.dataTables_scrollBody');
-        if(scrollEl) {
-            scrollEl.addEventListener('touchstart', function() {}, {passive: true});
-        }
+        if(scrollEl) scrollEl.addEventListener('touchstart', function() {}, {passive: true});
 
-    } catch (err) { 
-        console.error("Data Error:", err);
-    }
+    } catch (err) { console.error("Data Error:", err); }
 }
 
 function renderTable(data) {
@@ -47,21 +41,27 @@ function renderTable(data) {
     data.forEach((item, index) => {
         const vMap = item.valueMap || {};
         const seconds = Math.floor(item.videoTimeAssociated / 1000);
-        tbody.append(`<tr data-idx="${index}" data-url="${item.videoPathAssociated}" data-time="${seconds}"><td class="row-index"></td><td>${item.name || ''}</td><td>${vMap["Giocatore attacco"] ? vMap["Giocatore attacco"].substring(0,3).toUpperCase() : '-'}</td><td>${vMap["Squadra attacco"] || '-'}</td><td>${vMap["Periodo"] ? vMap["Periodo"].toString().charAt(0) : '-'}</td></tr>`);
+        tbody.append(`<tr data-idx="${index}" data-url="${item.videoPathAssociated}" data-time="${seconds}">
+            <td class="row-index"></td>
+            <td>${item.name || ''}</td>
+            <td>${vMap["Giocatore attacco"] ? vMap["Giocatore attacco"].substring(0,3).toUpperCase() : '-'}</td>
+            <td>${vMap["Squadra attacco"] || '-'}</td>
+            <td>${vMap["Periodo"] ? vMap["Periodo"].toString().charAt(0) : '-'}</td>
+        </tr>`);
     });
 
     if ($.fn.DataTable.isDataTable('#videoTable')) table.destroy();
     
     table = $('#videoTable').DataTable({ 
-        paging: false, 
-        info: false, 
-        dom: 'rt', 
-        scrollY: $(window).width() > 991 ? '100%' : '350px', 
-        scrollCollapse: true, 
-        scrollX: true,
-        columnDefs: [{ targets: 0, orderable: false }], 
-        order: [[0, 'asc']],
-        autoWidth: false
+        paging: false, info: false, dom: 'rt', 
+        scrollY: '100%', scrollCollapse: true, scrollX: true,
+        autoWidth: false,
+        columnDefs: [
+            { targets: 0, width: '30px', orderable: false },
+            { targets: 1, width: '130px' },
+            { targets: [2,3,4], width: '70px' }
+        ], 
+        order: [[0, 'asc']]
     });
 
     table.on('order.dt search.dt', function () {
@@ -119,6 +119,7 @@ function applyFilters() {
 
 function resetAll() { $('.column-filter').prop('checked', false); table.order([0, 'asc']).search('').draw(); updateResetVisibility(); }
 function resetFilters() { resetAll(); toggleModal('filterModal', false); }
+
 function updateResetVisibility() {
     const hasFilter = $('.column-filter:checked').length > 0;
     const isOrdered = table.order().length > 0 && (table.order()[0][0] !== 0 || table.order()[0][1] !== 'asc');
@@ -149,16 +150,15 @@ function playVideo(url, time) {
 
 function toggleMobileMenu(e) { e.stopPropagation(); $('#navMenu').toggleClass('open'); }
 function toggleModal(id, show) { $(`#${id}`).css('display', show ? 'block' : 'none'); }
+
 $(window).on('click', e => { 
     if (!$(e.target).closest('.nav-right').length) $('#navMenu').removeClass('open');
     if ($(e.target).hasClass('modal')) $('.modal').hide();
 });
+
 $(window).on('resize', () => { 
     if ($(window).width() > 991) $('#navMenu').removeClass('open'); 
-    // Aggiorna altezza DataTable al resize
-    if(table) {
-        const newH = $(window).width() > 991 ? '100%' : '350px';
-        $('.dataTables_scrollBody').css('height', newH);
-    }
+    if(table) table.columns.adjust(); // Ricalcola lo scroll orizzontale al cambio orientamento
 });
+
 $(document).ready(init);
