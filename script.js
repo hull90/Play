@@ -148,6 +148,23 @@ function playVideo(url, time) {
     }
 }
 
+
+function changeOffset(delta) {
+    const input = $('#offsetSeconds');
+    let val = parseInt(input.val()) || 0;
+    val += delta;
+    input.val(val);
+    
+    // Salva automaticamente
+    localStorage.setItem('videoLab_offset', val);
+    
+    // Feedback visivo rapido sul click
+    console.log("Nuovo Offset:", val);
+}
+
+// Ricorda di rimuovere o aggiornare l'event listener 'input' in init() 
+// se avevi messo quello per l'inserimento manuale, anche se il 'readonly' lo protegge.
+
 function toggleMobileMenu(e) { e.stopPropagation(); $('#navMenu').toggleClass('open'); }
 function toggleModal(id, show) { $(`#${id}`).css('display', show ? 'block' : 'none'); }
 
