@@ -1,139 +1,517 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Video Lab Pro - Match Analysis</title>
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
-    <style>
-        :root { --primary: #00b3ff; --bg: #f4f7f9; --highlight: #e0f4ff; --dark: #1e293b; --topbar-h: 60px; }
-        
-        html, body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); height: 100vh; width: 100vw; overflow: hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Video Lab Pro - Match Analysis</title>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <style>
+    :root {
+      --primary: #00b3ff;
+      --bg: #f4f7f9;
+      --highlight: #e0f4ff;
+      --dark: #1e293b;
+      --topbar-h: 60px;
+    }
 
-        /* Topbar Rigida */
-        .top-nav { height: var(--topbar-h); background: var(--dark); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; position: fixed; top: 0; width: 100%; z-index: 1001; box-sizing: border-box; }
-        .nav-left { display: flex; align-items: baseline; gap: 10px; overflow: hidden; flex: 1; min-width: 0; }
-        .nav-left h1 { margin: 0; font-size: 1rem; font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .nav-left h1 b { color: var(--primary); }
-        #event-date { opacity: 0.6; font-size: 0.75rem; white-space: nowrap; }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
 
-        .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; gap: 5px; }
-        
-        #globalResetBtn { display: none; background: #334155; color: var(--primary); border: 1px solid var(--primary); padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
-        .btn-icon { background: #334155; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; }
-        .hamburger { display: block; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+    /* Topbar Rigida */
+    .top-nav {
+      height: var(--topbar-h);
+      background: var(--dark);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1001;
+      box-sizing: border-box;
+    }
 
-        .nav-menu { display: flex; align-items: center; gap: 10px; }
+    .nav-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+    }
 
-        /* --- Layout Dinamico --- */
-        .main-layout { display: flex; flex-direction: column; gap: 15px; padding: 10px; margin-top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); box-sizing: border-box; }
+    .nav-left h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 300;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-        .video-column { flex-shrink: 0; width: 100%; }
-        .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .nav-left h1 b {
+      color: var(--primary);
+    }
 
-        .table-column { 
-            background: white; border-radius: 12px; padding: 10px; 
-            flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        /* Forza lo scroll indipendente della tabella */
-        .table-container-scroll { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-        .dataTables_wrapper { height: 100%; display: flex; flex-direction: column; }
-        .dataTables_scroll { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .dataTables_scrollBody { 
-            flex: 1 !important; 
-            -webkit-overflow-scrolling: touch !important; 
-            touch-action: pan-x pan-y !important;
-        }
+    #event-date {
+      opacity: 0.6;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
 
-        /* --- Mobile Portrait (Verticale) --- */
-        @media (max-width: 991px) and (orientation: portrait) {
-            .nav-menu { display: none; position: absolute; top: var(--topbar-h); right: 0; background: var(--dark); flex-direction: column; width: 180px; padding: 15px; box-shadow: -5px 5px 15px rgba(0,0,0,0.3); border-radius: 0 0 0 12px; }
-            .nav-menu.open { display: flex !important; }
-            .control-unit { flex-direction: column; align-items: flex-start; gap: 5px; width: 100%; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-            table.dataTable tbody td { padding: 12px 8px !important; font-size: 0.75rem; }
-        }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
 
-        /* --- Mobile Landscape (Orizzontale) --- */
-        @media (max-width: 991px) and (orientation: landscape) {
-            .main-layout { flex-direction: row; gap: 10px; padding: 5px; }
-            .video-column { flex: 1.2; } /* Video leggermente più grande */
-            .table-column { flex: 1; }
-            .top-nav { height: 45px; } /* Risparmiamo spazio verticale */
-            :root { --topbar-h: 45px; }
-            .nav-menu { width: 150px; }
-        }
+    .btn-main {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
 
-        /* --- Desktop --- */
-        @media (min-width: 992px) {
-            .hamburger { display: none !important; }
-            .nav-menu { display: flex !important; position: static; background: none; padding: 0; width: auto; box-shadow: none; flex-direction: row; }
-            .main-layout { flex-direction: row-reverse; padding: 20px; gap: 20px; } 
-            .video-column { flex: 2; } 
-            .table-column { flex: 0 0 450px; padding: 15px; }
-            .top-nav { padding: 0 20px; }
-        }
+    #globalResetBtn {
+      display: none;
+      background: #334155;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
 
-        /* Styling Tabella Finale */
-        table.dataTable thead th { font-size: 0.65rem; padding: 10px 8px !important; white-space: nowrap; background: #f8fafc; }
-        table.dataTable tbody td { white-space: nowrap; border-bottom: 1px solid #f1f5f9 !important; }
-        table.dataTable tbody tr.active-row td { background-color: var(--highlight) !important; color: var(--primary); font-weight: bold; border-left: 4px solid var(--primary); }
-        
-        .dataTables_filter, .dataTables_info, .dataTables_paginate { display: none !important; }
-        
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; }
-        .control-unit { display: flex; align-items: center; gap: 8px; }
-        .control-unit input { width: 45px; background: #334155; border: 1px solid #475569; color: white; padding: 4px; border-radius: 4px; text-align: center; }
-    </style>
+    .btn-icon {
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .hamburger {
+      display: block;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* --- Layout Dinamico --- */
+    .main-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 10px;
+      margin-top: var(--topbar-h);
+      height: calc(100vh - var(--topbar-h));
+      box-sizing: border-box;
+    }
+
+    .video-column {
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    .video-wrapper {
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .table-column {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Forza lo scroll indipendente della tabella */
+    .table-container-scroll {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dataTables_wrapper {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dataTables_scroll {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .dataTables_scrollBody {
+      flex: 1 !important;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: pan-x pan-y !important;
+    }
+
+    /* --- Mobile Portrait (Verticale) --- */
+    @media (max-width: 991px) and (orientation: portrait) {
+      .nav-menu {
+        display: none;
+        position: absolute;
+        top: var(--topbar-h);
+        right: 0;
+        background: var(--dark);
+        flex-direction: column;
+        width: 180px;
+        padding: 15px;
+        box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.3);
+        border-radius: 0 0 0 12px;
+      }
+
+      .nav-menu.open {
+        display: flex !important;
+      }
+
+      .control-unit {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        width: 100%;
+        border-bottom: 1px solid #334155;
+        padding-bottom: 10px;
+      }
+
+      table.dataTable tbody td {
+        padding: 12px 8px !important;
+        font-size: 0.75rem;
+      }
+    }
+
+    /* --- Mobile Landscape (Orizzontale) --- */
+    @media (max-width: 991px) and (orientation: landscape) {
+      .main-layout {
+        flex-direction: row;
+        gap: 10px;
+        padding: 5px;
+      }
+
+      .video-column {
+        flex: 1.2;
+      }
+
+      /* Video leggermente più grande */
+      .table-column {
+        flex: 1;
+      }
+
+      .top-nav {
+        height: 45px;
+      }
+
+      /* Risparmiamo spazio verticale */
+      :root {
+        --topbar-h: 45px;
+      }
+
+      .nav-menu {
+        width: 150px;
+      }
+    }
+
+    /* --- Desktop --- */
+    @media (min-width: 992px) {
+      .hamburger {
+        display: none !important;
+      }
+
+      .nav-menu {
+        display: flex !important;
+        position: static;
+        background: none;
+        padding: 0;
+        width: auto;
+        box-shadow: none;
+        flex-direction: row;
+      }
+
+      .main-layout {
+        flex-direction: row-reverse;
+        padding: 20px;
+        gap: 20px;
+      }
+
+      .video-column {
+        flex: 2;
+      }
+
+      .table-column {
+        flex: 0 0 450px;
+        padding: 15px;
+      }
+
+      .top-nav {
+        padding: 0 20px;
+      }
+    }
+
+    /* Styling Tabella Finale */
+    table.dataTable thead th {
+      font-size: 0.65rem;
+      padding: 10px 8px !important;
+      white-space: nowrap;
+      background: #f8fafc;
+    }
+
+    table.dataTable tbody td {
+      white-space: nowrap;
+      border-bottom: 1px solid #f1f5f9 !important;
+    }
+
+    table.dataTable tbody tr.active-row td {
+      background-color: var(--highlight) !important;
+      color: var(--primary);
+      font-weight: bold;
+      border-left: 4px solid var(--primary);
+    }
+
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_paginate {
+      display: none !important;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 85%;
+      max-width: 400px;
+    }
+
+    .control-unit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-unit input {
+      width: 45px;
+      background: #334155;
+      border: 1px solid #475569;
+      color: white;
+      padding: 4px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    /* Stile Spinner Custom */
+    .spinner-control {
+      display: flex;
+      align-items: center;
+      background: #334155;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      overflow: hidden;
+    }
+
+    .spinner-control button {
+      background: #475569;
+      color: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .spinner-control button:active {
+      background: var(--primary);
+    }
+
+    .spinner-control input {
+      width: 45px;
+      border: none;
+      background: transparent;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+      -moz-appearance: textfield;
+    }
+
+    .spinner-control input::-webkit-inner-spin-button,
+    .spinner-control input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .control-unit label {
+      font-size: 0.6rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 991px) {
+      .control-unit {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #334155;
+        padding-bottom: 15px;
+      }
+
+      .spinner-control {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .spinner-control button {
+        width: 30%;
+        height: 45px;
+      }
+
+      /* Più grandi per il pollice */
+      .spinner-control input {
+        flex: 1;
+      }
+    }
+  </style>
 </head>
+
 <body>
-
-    <nav class="top-nav">
-        <div class="nav-left">
-            <h1 id="main-title">VIDEO<b>LAB</b></h1>
-            <span id="event-date">...</span>
-        </div>
-        <div class="nav-right">
-            <button id="globalResetBtn" onclick="resetAll()">🧹</button>
-            <button id="playBtn" class="btn-main">▶ PLAY</button>
-            <button class="hamburger" onclick="toggleMobileMenu(event)">☰</button>
-            <div class="nav-menu" id="navMenu">
-                <div class="control-unit"><label style="font-size:0.6rem; color:#94a3b8;">OFFSET</label><input type="number" id="offsetSeconds" value="0"></div>
-                <button class="btn-icon" onclick="toggleModal('filterModal', true); $('#navMenu').removeClass('open');">🔍 FILTRI</button>
-                <button id="detailsBtn" class="btn-main" style="background:#64748b; opacity: 0.2; pointer-events: none;">📄 INFO</button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="main-layout">
-        <div class="video-column">
-            <div class="video-wrapper">
-                <div id="player-container"><div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div></div>
-            </div>
-        </div>
-        <div class="table-column">
-            <div class="table-container-scroll">
-                <table id="videoTable" class="display nowrap" style="width:100%">
-                    <thead>
-                        <tr><th>#</th><th>Evento</th><th>Player</th><th>Team</th><th>Per</th></tr>
-                    </thead>
-                    <tbody id="video-table-body"></tbody>
-                </table>
-            </div>
-        </div>
+  <nav class="top-nav">
+    <div class="nav-left">
+      <h1 id="main-title">VIDEO<b>LAB</b></h1>
+      <span id="event-date">...</span>
     </div>
-
-    <div id="filterModal" class="modal"><div class="modal-content"><h3>Filtri</h3><div id="filter-container"></div><div style="text-align:right; margin-top:20px;"><button class="btn-icon" style="background:#ef4444; display:inline-block; margin-right:5px;" onclick="resetFilters()">Reset</button><button class="btn-icon" style="background:var(--primary); display:inline-block;" onclick="applyFilters()">Applica</button></div></div></div>
-    <div id="detailsModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between;"><h3>Dettagli</h3><button onclick="toggleModal('detailsModal', false)" style="border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button></div><div id="details-container"></div></div></div>
-
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="script.js"></script>
+    <div class="nav-right">
+      <button id="globalResetBtn" onclick="resetAll()">🧹</button>
+      <button id="playBtn" class="btn-main">▶ PLAY</button>
+      <button class="hamburger" onclick="toggleMobileMenu(event)">☰</button>
+      <div class="nav-menu" id="navMenu">
+        <div class="control-unit">
+          <label>OFFSET (sec)</label>
+          <div class="spinner-control">
+            <button onclick="changeOffset(-1)">−</button>
+            <input type="number" id="offsetSeconds" value="0" readonly>
+            <button onclick="changeOffset(1)">+</button>
+          </div>
+        </div>
+        <button class="btn-icon" onclick="toggleModal('filterModal', true); $('#navMenu').removeClass('open');">🔍
+          FILTRI</button>
+        <button id="detailsBtn" class="btn-main" style="background:#64748b; opacity: 0.2; pointer-events: none;">📄
+          INFO</button>
+      </div>
+    </div>
+  </nav>
+  <div class="main-layout">
+    <div class="video-column">
+      <div class="video-wrapper">
+        <div id="player-container">
+          <div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div>
+        </div>
+      </div>
+    </div>
+    <div class="table-column">
+      <div class="table-container-scroll">
+        <table id="videoTable" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Evento</th>
+              <th>Player</th>
+              <th>Team</th>
+              <th>Per</th>
+            </tr>
+          </thead>
+          <tbody id="video-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="filterModal" class="modal">
+    <div class="modal-content">
+      <h3>Filtri</h3>
+      <div id="filter-container"></div>
+      <div style="text-align:right; margin-top:20px;"><button class="btn-icon"
+          style="background:#ef4444; display:inline-block; margin-right:5px;"
+          onclick="resetFilters()">Reset</button><button class="btn-icon"
+          style="background:var(--primary); display:inline-block;" onclick="applyFilters()">Applica</button></div>
+    </div>
+  </div>
+  <div id="detailsModal" class="modal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between;">
+        <h3>Dettagli</h3><button onclick="toggleModal('detailsModal', false)"
+          style="border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div id="details-container"></div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>
