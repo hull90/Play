@@ -1,0 +1,320 @@
+/* 1. VARIABILI E RESET */
+:root {
+  --primary: #00b3ff;
+  --bg: #f4f7f9;
+  --highlight: #e0f4ff;
+  --dark: #1e293b;
+  --topbar-h: 60px;
+  --ui-h: 38px;
+}
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  height: 100vh; width: 100vw;
+  overflow: hidden;
+}
+
+/* 2. LAYOUT STRUTTURALE */
+.top-nav {
+  height: var(--topbar-h);
+  background: var(--dark);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  position: fixed;
+  top: 0; width: 100%;
+  z-index: 1001;
+  box-sizing: border-box;
+}
+
+.nav-left { display: flex; align-items: baseline; gap: 10px; overflow: hidden; flex: 1; }
+.nav-left h1 { margin: 0; font-size: 1rem; font-weight: 300; white-space: nowrap; }
+.nav-left h1 b { color: var(--primary); }
+.nav-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  margin-top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 3. VIDEO COLUMN & PLAYER */
+.video-column { width: 100%; flex-shrink: 0; }
+
+.video-wrapper {
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+#player-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+}
+
+/* 4. TABLE COLUMN & DATATABLES */
+
+.table-column {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Essenziale per permettere il resize */
+  overflow: hidden; /* Impedisce alla tabella di allungare il div */
+}
+
+/* Forza DataTables a stare dentro il contenitore flex */
+.dataTables_wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dataTables_scroll {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dataTables_scrollBody {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch; /* Scroll fluido su iOS */
+}
+
+table.dataTable tbody td {
+  padding: 12px 8px !important;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+table.dataTable tbody tr.active-row td {
+  background-color: var(--highlight) !important;
+  color: var(--primary);
+  font-weight: bold;
+  border-left: 4px solid var(--primary);
+}
+
+/* 5. CONTROLLI UI */
+.btn-icon, .btn-main, .custom-select, .spinner-control {
+  height: var(--ui-h);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 
+.btn-main { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+.btn-icon { background: #334155; color: white; border: 1px solid #475569; padding: 0 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+ */
+
+.btn-main {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  
+  /* --- PEZZI AGGIUNTI --- */
+  height: var(--ui-h);         /* Altezza consistente con la barra */
+  display: inline-flex;        /* Attiva il box flessibile */
+  align-items: center;         /* Centra verticalmente l'icona/testo */
+  justify-content: center;      /* Centra orizzontalmente */
+  box-sizing: border-box;      /* Include il bordo nell'altezza totale */
+  font-size: 1rem;             /* Leggermente più grande per il testo "PLAY" */
+  gap: 8px;                    /* Spazio tra eventuale icona e testo */
+}
+
+.btn-icon {
+  background: #334155;
+  color: white;
+  border: 1px solid #475569;
+  padding: 0 10px;             /* Ridotto leggermente per bilanciare la larghezza */
+  border-radius: 6px;
+  cursor: pointer;
+  
+  /* --- PEZZI AGGIUNTI --- */
+  height: var(--ui-h);         /* Altezza consistente con la barra */
+  min-width: var(--ui-h);      /* Lo rende almeno quadrato */
+  display: inline-flex;        /* Centratura perfetta dell'emoji */
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-size: 1.3rem;           /* EMOJI PIÙ GRANDE */
+  line-height: 1;              /* Evita che l'interlinea sposti l'emoji */
+}
+
+/* Effetto hover opzionale per rendere le icone più interattive */
+.btn-icon:hover, .btn-main:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.spinner-control { background: #334155; border-radius: 6px; border: 1px solid #475569; overflow: hidden; }
+.spinner-control button { background: #475569; color: white; border: none; width: 32px; height: 100%; cursor: pointer; }
+.spinner-control input { width: 35px; border: none; background: transparent; color: white; text-align: center; font-weight: bold; }
+
+.custom-select { background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; padding: 0 8px; font-size: 0.8rem; outline: none; appearance: none; }
+
+#globalResetBtn {
+  height: var(--ui-h);
+  width: var(--ui-h); /* Lo rende quadrato */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.2rem;
+  background: #334155; /* Stesso colore degli altri tasti secondari */
+  border: 1px solid #475569;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#globalResetBtn:hover {
+  background: #475569;
+  border-color: var(--primary);
+}
+
+
+.hamburger { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+
+/* 6. MODALS */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background: white;
+  margin: 5vh auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 85%; max-width: 450px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+#filter-container, #details-container { overflow-y: auto; flex: 1; padding-right: 10px; margin-top: 10px; }
+
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding-top: 15px; margin-top: 15px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* 7. RESPONSIVE & MEDIA QUERIES */
+@media (min-width: 992px) {
+  .hamburger { display: none !important; }
+  .nav-menu { display: flex !important; flex-direction: row; gap: 6px; }
+  .main-layout { flex-direction: row-reverse; padding: 20px; gap: 20px; }
+  .video-column { flex: 2; }
+  .table-column { flex: 0 0 450px; }
+}
+
+
+
+/* Mobile Menu */
+    @media (max-width: 991px) {
+      .nav-menu {
+        display: none;
+        position: absolute;
+        top: var(--topbar-h);
+        right: 0;
+        background: var(--dark);
+        flex-direction: column;
+        width: 180px;
+        padding: 15px;
+        box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.3);
+        border-radius: 0 0 0 12px;
+        gap: 12px;
+      }
+      .nav-menu.open {
+        display: flex !important;
+      }
+    }
+
+/* FIX: Assicuriamoci che il container della tabella sia flessibile */
+    .table-container-scroll {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+/* 8. HIDE DATATABLES JUNK */
+.dataTables_filter, .dataTables_info, .dataTables_paginate { display: none !important; }
+
+/* Assicura che il player Plyr riempia sempre il suo contenitore */
+.video-column .plyr {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Nasconde freccette native negli input number */
+.no-spinners::-webkit-inner-spin-button,
+.no-spinners::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinners {
+  -moz-appearance: textfield; /* Per Firefox */
+}
+
+
+/* Stile per il selettore velocità perfettamente allineato */
+.custom-select {
+  background: #334155;
+  color: white;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  
+  /* Usa la variabile globale per l'altezza */
+  height: var(--ui-h); 
+  padding: 0 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box; /* Fondamentale per includere il bordo nell'altezza */
+  
+  display: flex;
+  align-items: center;
+}
+
+.custom-select:hover {
+  border-color: var(--primary);
+}
+
+/* Opzionale: uniforma anche l'altezza dell'input offset se sembra diverso */
+#offsetSeconds {
+  height: var(--ui-h);
+  box-sizing: border-box;
+}
