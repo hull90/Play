@@ -1,0 +1,54 @@
+{
+  "name": "TEST MULTI-PLAYER",
+  "date": "2024-05-20 10:00",
+  "markerInstanceList": [
+    {
+      "name": "Dailymotion Test 1",
+      "videoPathAssociated": "https://www.dailymotion.com/video/x8u6jli",
+      "videoTimeAssociated": 40000,
+      "valueMap": { "Giocatore attacco": "DAILY", "Squadra attacco": "TEAM DM", "Periodo": "1" }
+    },
+    {
+      "name": "YouTube Test 1",
+      "videoPathAssociated": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      "videoTimeAssociated": 30000,
+      "valueMap": { "Giocatore attacco": "YOUTUBE", "Squadra attacco": "TEAM YT", "Periodo": "1" }
+    },
+    {
+      "name": "Vimeo Test 1",
+      "videoPathAssociated": "https://vimeo.com/22439234",
+      "videoTimeAssociated": 15000,
+      "valueMap": { "Giocatore attacco": "VIMEO", "Squadra attacco": "TEAM VM", "Periodo": "1" }
+    },
+    {
+      "name": "Dailymotion Test 2",
+      "videoPathAssociated": "https://www.dailymotion.com/video/x8u6jli",
+      "videoTimeAssociated": 5000,
+      "valueMap": { "Giocatore attacco": "DM-02", "Squadra attacco": "TEAM DM", "Periodo": "2" }
+    },
+    {
+      "name": "YouTube Test 2",
+      "videoPathAssociated": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      "videoTimeAssociated": 60000,
+      "valueMap": { "Giocatore attacco": "YT-02", "Squadra attacco": "TEAM YT", "Periodo": "2" }
+    },
+    {
+      "name": "Vimeo Test 2",
+      "videoPathAssociated": "https://vimeo.com/76979871",
+      "videoTimeAssociated": 20000,
+      "valueMap": { "Giocatore attacco": "VM-02", "Squadra attacco": "TEAM VM", "Periodo": "2" }
+    },
+    {
+      "name": "Dailymotion Test 3",
+      "videoPathAssociated": "https://www.dailymotion.com/video/x8u6jli",
+      "videoTimeAssociated": 12000,
+      "valueMap": { "Giocatore attacco": "DM-03", "Squadra attacco": "TEAM DM", "Periodo": "3" }
+    },
+    {
+      "name": "YouTube Test 3",
+      "videoPathAssociated": "https://www.youtube.com/watch?v=ScMzIvxBSi4",
+      "videoTimeAssociated": 45000,
+      "valueMap": { "Giocatore attacco": "YT-03", "Squadra attacco": "TEAM YT", "Periodo": "3" }
+    }
+  ]
+}
