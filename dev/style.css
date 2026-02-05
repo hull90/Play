@@ -4,8 +4,8 @@
   --bg: #f4f7f9;
   --highlight: #e0f4ff;
   --dark: #1e293b;
-  --topbar-h: 60px;
-  --ui-h: 38px;
+  --topbar-h: 48px;
+  --ui-h: 36px;
 }
 
 html, body {
@@ -17,18 +17,55 @@ html, body {
 }
 
 /* 2. LAYOUT STRUTTURALE */
+/* ... */
+.video-controls {
+  background-color: transparent; /* rende la barra dei controlli trasparente */
+  display: flex;
+  justify-content: flex-end; /* allinea i pulsanti verso destra */
+  padding: 0.2em;
+}
+
+.video-controls .btn-icon .btn-main svg {
+  //width: 1em; /* riduce la dimensione delle icone */
+  /* height: 1em; */
+  height: var(--ui-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* .video-controls .btn-icon, .video-controls .btn-main {
+  height: var(--ui-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+/* Modifica della struttura top-nav per eliminare la parte destra */
 .top-nav {
   height: var(--topbar-h);
   background: var(--dark);
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* Modificato per allineare a sinistra */
   padding: 0 10px;
   position: fixed;
   top: 0; width: 100%;
   z-index: 1001;
   box-sizing: border-box;
+}
+
+.nav-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.nav-right {
+  display: none; /* Nascondiamo la parte destra della barra */
 }
 
 .nav-left { display: flex; align-items: baseline; gap: 10px; overflow: hidden; flex: 1; }
@@ -80,8 +117,9 @@ html, body {
 }
 
 /* Forza DataTables a stare dentro il contenitore flex */
+/* style.css */
 .dataTables_wrapper {
-  height: 100%;
+   height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -145,7 +183,7 @@ table.dataTable tbody tr.active-row td {
 }
 
 .btn-icon {
-  background: #334155;
+  background: var(--dark);
   color: white;
   border: 1px solid #475569;
   padding: 0 10px;             /* Ridotto leggermente per bilanciare la larghezza */
@@ -169,34 +207,20 @@ table.dataTable tbody tr.active-row td {
   transform: translateY(-1px);
 }
 
-.spinner-control { background: #334155; border-radius: 6px; border: 1px solid #475569; overflow: hidden; }
-.spinner-control button { background: #475569; color: white; border: none; width: 32px; height: 100%; cursor: pointer; }
+.spinner-control {    height: var(--ui-h);         /* Altezza consistente con la barra */
+  min-width: var(--ui-h);  
+  font-size: 1.3rem; 
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box; /* Fondamentale per includere il bordo nell'altezza */
+   background: var(--dark); border-radius: 6px; border: 1px solid #475569; overflow: hidden; 
+}
+.spinner-control button {background: #475569; color: white; border: none; width: 32px; height: 100%; cursor: pointer; }
 .spinner-control input { width: 35px; border: none; background: transparent; color: white; text-align: center; font-weight: bold; }
 
-.custom-select { background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; padding: 0 8px; font-size: 0.8rem; outline: none; appearance: none; }
+.custom-select { background: var(--dark); color: white; border: 1px solid #475569; border-radius: 6px; padding: 0 8px; font-size: 0.8rem; outline: none; appearance: none; }
 
-#globalResetBtn {
-  height: var(--ui-h);
-  width: var(--ui-h); /* Lo rende quadrato */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 1.2rem;
-  background: #334155; /* Stesso colore degli altri tasti secondari */
-  border: 1px solid #475569;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-#globalResetBtn:hover {
-  background: #475569;
-  border-color: var(--primary);
-}
-
-
-.hamburger { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+.hamburger { background: none; border: none; color: var(--dark); font-size: 1.5rem; cursor: pointer; padding: 5px; }
 
 /* 6. MODALS */
 .modal {
@@ -291,7 +315,7 @@ table.dataTable tbody tr.active-row td {
 
 /* Stile per il selettore velocità perfettamente allineato */
 .custom-select {
-  background: #334155;
+  background: var(--dark);
   color: white;
   border: 1px solid #475569;
   border-radius: 6px;

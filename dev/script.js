@@ -23,17 +23,19 @@ async function init() {
     } else {
       root = JSON.parse(new TextDecoder("utf-8").decode(uint8View));
     }
-    $('#main-title').html(`<b>${root.name || 'VIDEO LAB'}</b>`);
+    $('#main-title').html(`<b>${root.name || root.nome || 'VIDEO LAB'}</b>`);
 
-    if (root.date) {
-      const d = new Date(root.date);
+    const docDate = root.date || root.dataCreazione;
+    
+    if (docDate) {
+      const d = new Date(docDate);
       if (!isNaN(d.getTime())) {
         const day = String(d.getDate()).padStart(2, '0');
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const year = d.getFullYear();
         $('#event-date').text(`${day}/${month}/${year}`);
       } else {
-        $('#event-date').text(root.date.split(' ')[0]);
+        $('#event-date').text(docDate.split(' ')[0]);
       }
     }
     allData = root.markerInstanceList || [];
@@ -136,49 +138,47 @@ function generateFilterUI() {
   const container = $('#filter-container').empty();
   if (allData.length === 0) return;
 
-  // 1. Identifichiamo tutte le chiavi possibili (standard + valueMap)
-  // Teniamo "Evento" come primo elemento fisso
-  const keys = [{ label: "Evento", key: "name", isVMap: false }];
+  // 1. Identifichiamo tutte le chiavi e raccogliamo i valori (O(N))
+  const filterSpecs = new Map();
+  filterSpecs.set("name", { label: "Evento", isVMap: false, values: new Set() });
 
-  let vMapKeys = new Set();
   allData.forEach(item => {
+    if (item.name) filterSpecs.get("name").values.add(item.name);
     if (item.valueMap) {
-      Object.keys(item.valueMap).forEach(k => {
-        // Manteniamo il filtro per escludere Coordinate e Distanza
-        if (k !== 'Coordinate' && k !== 'Distanza') {
-          vMapKeys.add(k);
+      Object.entries(item.valueMap).forEach(([k, v]) => {
+        if (k !== 'Coordinate' && k !== 'Distanza' && v !== null && v !== undefined && v !== "") {
+          if (!filterSpecs.has(k)) filterSpecs.set(k, { label: k, isVMap: true, values: new Set() });
+          filterSpecs.get(k).values.add(v);
         }
       });
     }
   });
 
-  // --- MODIFICA: Convertiamo in Array e ordiniamo alfabeticamente ---
-  const sortedVMapKeys = Array.from(vMapKeys).sort((a, b) => a.localeCompare(b));
+  // 2. Ordiniamo le chiavi (Evento per primo, poi alfabetico)
+  const sortedKeys = Array.from(filterSpecs.keys()).sort((a, b) => {
+    if (a === "name") return -1;
+    if (b === "name") return 1;
+    return a.localeCompare(b);
+  });
 
-  // Aggiungiamo le chiavi ordinate alla lista dei filtri
-  sortedVMapKeys.forEach(k => keys.push({ label: k, key: k, isVMap: true }));
-
-  // 2. Generiamo l'interfaccia (il resto rimane invariato)
-  keys.forEach(c => {
-    const values = [...new Set(allData.map(item =>
-      c.isVMap ? (item.valueMap ? item.valueMap[c.key] : null) : item[c.key]
-    ))].filter(v => v !== null && v !== undefined && v !== "").sort();
-
-    if (values.length === 0) return; 
+  // 3. Generiamo l'interfaccia
+  sortedKeys.forEach(key => {
+    const spec = filterSpecs.get(key);
+    const sortedValues = Array.from(spec.values).sort();
+    if (sortedValues.length === 0) return;
 
     let html = `
             <div style="margin-bottom:15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                <b style="font-size:0.8rem; color:var(--dark); display:block; margin-bottom:8px;">${c.label}</b>
+                <b style="font-size:0.8rem; color:var(--dark); display:block; margin-bottom:8px;">${spec.label}</b>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">`;
 
-    values.forEach(v => {
+    sortedValues.forEach(v => {
       html += `
                 <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer; background:#f8fafc; padding:4px; border-radius:4px;">
-                    <input type="checkbox" class="column-filter" data-key="${c.key}" data-vmap="${c.isVMap}" value="${v}"> 
+                    <input type="checkbox" class="column-filter" data-key="${key}" data-vmap="${spec.isVMap}" value="${v}"> 
                     <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${v}">${v}</span>
                 </label>`;
     });
-
     container.append(html + `</div></div>`);
   });
 }
@@ -196,28 +196,35 @@ function generateFilterUI() {
 
 function applyFilters() {
   const filters = {};
-  $('.column-filter:checked').each(function () {
+  const activeCheckboxes = $('.column-filter:checked');
+  
+  if (activeCheckboxes.length === 0) {
+    $.fn.dataTable.ext.search = [];
+    table.draw();
+    updateResetVisibility();
+    toggleModal('filterModal', false);
+    return;
+  }
+
+  activeCheckboxes.each(function () {
     const key = $(this).data('key');
     const isVMap = $(this).data('vmap');
-    if (!filters[key]) filters[key] = { vals: [], vmap: isVMap };
-    filters[key].vals.push(String($(this).val()));
+    if (!filters[key]) filters[key] = { vals: new Set(), vmap: isVMap };
+    filters[key].vals.add(String($(this).val()));
   });
 
-  $.fn.dataTable.ext.search.push((settings, data, dataIndex) => {
-    // Recuperiamo l'oggetto originale tramite l'indice salvato nella riga
-    const rowNode = table.row(dataIndex).node();
-    const itemIdx = $(rowNode).data('idx');
-    const item = allData[itemIdx];
+  const filterEntries = Object.entries(filters);
 
-    for (let key in filters) {
-      const val = filters[key].vmap ? (item.valueMap ? item.valueMap[key] : null) : item[key];
-      if (!filters[key].vals.includes(String(val))) return false;
-    }
-    return true;
+  $.fn.dataTable.ext.search.push((settings, data, dataIndex) => {
+    const item = allData[$(table.row(dataIndex).node()).data('idx')];
+    return filterEntries.every(([key, f]) => {
+      const val = f.vmap ? (item.valueMap ? item.valueMap[key] : null) : item[key];
+      return f.vals.has(String(val));
+    });
   });
 
   table.draw();
-  $.fn.dataTable.ext.search.pop(); // Puliamo per il prossimo filtraggio
+  $.fn.dataTable.ext.search.pop();
   updateResetVisibility();
   toggleModal('filterModal', false);
 }
@@ -237,25 +244,22 @@ function showRowDetails() {
   const item = allData[selectedRowIdx];
   const container = $('#details-container').empty();
 
-  // 1. Aggiungiamo i dati tecnici del video (Path e Time)
-  const techDetails = `
+  // 1. Dati tecnici
+  container.append(`
         <div style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary);">
             <div style="font-size:0.75rem; color:#64748b; margin-bottom:4px;"><b>Sorgente Video:</b></div>
             <div style="font-size:0.75rem; word-break: break-all; margin-bottom:8px; color:var(--dark);">${item.videoPathAssociated}</div>
-            
-            <div style="font-size:0.75rem; color:#64748b; margin-bottom:4px;"><b>Timestamp (ms):</b></div>
+            <div style="font-size:0.75rem; color:#64748b; margin-bottom:4px;"><b>Timestamp:</b></div>
             <div style="font-size:0.8rem; font-family: monospace; color:var(--dark);">${item.videoTimeAssociated} ms</div>
         </div>
         <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-    `;
-  container.append(techDetails);
+  `);
 
-  // 2. Aggiungiamo il resto della valueMap come prima
+  // 2. ValueMap con filtri corretti
   if (item.valueMap) {
-      // SALTA LA PROPRIETÀ COORDINATE
-      if (item === 'Coordinate') return; 
-
     Object.entries(item.valueMap).forEach(([k, v]) => {
+      if (k === 'Coordinate' || k === 'Distanza') return; 
+
       container.append(`
                 <div style="font-size:0.8rem; margin-bottom:8px; display:flex; justify-content:space-between; border-bottom:1px solid #fafafa; padding-bottom:4px;">
                     <span style="color:#64748b;">${k}:</span>

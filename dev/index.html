@@ -16,43 +16,41 @@
       <h1 id="main-title">VIDEO<b>LAB</b></h1>
       <span id="event-date">...</span>
     </div>
-    <div class="nav-right">
-      <button id="globalResetBtn" class="btn-icon" onclick="resetAll()">🧹</button>
-      <button class="btn-icon" onclick="smartSkip(-10)">&lt;&lt;</button>
-      <button id="playBtn" class="btn-main">▶ PLAY</button>
-      <button class="btn-icon" onclick="smartSkip(10)">&gt;&gt;</button>
-      <button class="hamburger" onclick="toggleMobileMenu(event)">☰</button>
-      <div class="nav-menu" id="navMenu">
-        
-        <div class="control-unit">
-          <div class="spinner-control">
-            <button onclick="changeOffset(-1)">−</button>
-            <input type="number" id="offsetSeconds" value="0" class="no-spinners" readonly>
-            <button onclick="changeOffset(1)">+</button>
-          </div>
-        </div>
-        
-        <div class="control-unit">
-          <select id="speedSelect" class="custom-select" onchange="updatePlaybackSpeed(this.value)">
-            <option value="0.5">0.5x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1" selected>1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="2">2x</option>
-          </select>
-        </div>
-        <button class="btn-icon"
-          onclick="toggleModal('filterModal', true); $('#navMenu').removeClass('open');">🔍</button>
-        <button id="detailsBtn" class="btn-main" onclick="showRowDetails()" 
-          style="background:#64748b; opacity: 0.2; pointer-events: none;">📄</button>
-      </div>
-    </div>
-  
   </nav>
   
   <div class="main-layout">
     <div class="video-column">
+      <div class="video-controls">
+        <button id="globalResetBtn" class="btn-icon" onclick="resetAll()">🧹</button>
+        <button class="btn-icon" onclick="smartSkip(-10)">&lt;&lt;</button>
+        <button id="playBtn" class="btn-main">▶ PLAY</button>
+        <button class="btn-icon" onclick="smartSkip(10)">&gt;&gt;</button>
+        <button class="hamburger" onclick="toggleMobileMenu(event)">☰</button>
+        <div class="nav-menu" id="navMenu">
+          <div class="control-unit">
+            <div class="spinner-control">
+              <button onclick="changeOffset(-1)">−</button>
+              <input type="number" id="offsetSeconds" value="0" class="no-spinners" readonly>
+              <button onclick="changeOffset(1)">+</button>
+            </div>
+          </div>
+
+          <div class="control-unit">
+            <select id="speedSelect" class="custom-select" onchange="updatePlaybackSpeed(this.value)">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+          <button class="btn-icon"
+            onclick="toggleModal('filterModal', true); $('#navMenu').removeClass('open');">🔍</button>
+          <button id="detailsBtn" class="btn-main" onclick="showRowDetails()"
+            style="background:#64748b; opacity: 0.2; pointer-events: none;">📄</button>
+        </div>
+      </div>
       <div class="video-wrapper">
         <div id="player-container">
           <div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div>
