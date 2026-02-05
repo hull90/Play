@@ -12,5 +12,5 @@
       }
     ]
   },
-  { "name": "Individual Scouting", "type": "file", "path": "scouting_player1.json", "date": "2026-02-01" }
+  { "name": "Individual Scouting", "type": "file", "path": "tet.json", "date": "2026-02-01" }
 ]
