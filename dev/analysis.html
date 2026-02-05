@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Video Lab Pro - Match Analysis</title>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body onload="checkAuth(); init()">
+  <nav class="top-nav">
+    <div class="nav-left">
+      <button onclick="window.location.href='dashboard.html'" class="btn-icon" style="margin-right:15px;">⬅</button>
+      <h1 id="main-title">VIDEO<b>LAB</b></h1>
+      <span id="event-date">...</span>
+    </div>
+  </nav>
+  
+  <div class="main-layout">
+    <div class="video-column">
+      <div class="video-controls">
+        <button id="globalResetBtn" class="btn-icon" onclick="resetAll()">🧹</button>
+        <button class="btn-icon" onclick="smartSkip(-10)">&lt;&lt;</button>
+        <button id="playBtn" class="btn-main">▶ PLAY</button>
+        <button class="btn-icon" onclick="smartSkip(10)">&gt;&gt;</button>
+        <button class="hamburger" onclick="toggleMobileMenu(event)">☰</button>
+        <div class="nav-menu" id="navMenu">
+          <div class="control-unit">
+            <div class="spinner-control">
+              <button onclick="changeOffset(-1)">−</button>
+              <input type="number" id="offsetSeconds" value="0" class="no-spinners" readonly>
+              <button onclick="changeOffset(1)">+</button>
+            </div>
+          </div>
+
+          <div class="control-unit">
+            <select id="speedSelect" class="custom-select" onchange="updatePlaybackSpeed(this.value)">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+          <button class="btn-icon"
+            onclick="toggleModal('filterModal', true); $('#navMenu').removeClass('open');">🔍</button>
+          <button id="detailsBtn" class="btn-main" onclick="showRowDetails()"
+            style="background:#64748b; opacity: 0.2; pointer-events: none;">📄</button>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <div id="player-container">
+          <div id="player" data-plyr-provider="youtube" data-plyr-embed-id=""></div>
+        </div>
+      </div>
+    </div>
+    <div class="table-column">
+      <div class="table-container-scroll">
+        <table id="videoTable" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Evento</th>
+              <th>Player</th>
+              <th>Team</th>
+              <th>Per</th>
+            </tr>
+          </thead>
+          <tbody id="video-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="filterModal" class="modal">
+    <div class="modal-content">
+      <h3>Filtri</h3>
+      <div id="filter-container"></div>
+      <div style="text-align:right; margin-top:20px;"><button class="btn-icon"
+          style="background:#ef4444; display:inline-block; margin-right:5px;"
+          onclick="resetFilters()">Reset</button><button class="btn-icon"
+          style="background:var(--primary); display:inline-block;" onclick="applyFilters()">Applica</button></div>
+    </div>
+  </div>
+  <div id="detailsModal" class="modal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between;">
+        <h3>Dettagli</h3><button onclick="toggleModal('detailsModal', false)"
+          style="border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div id="details-container"></div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

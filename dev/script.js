@@ -1,3 +1,109 @@
+function handleLogin() {
+    const loginBtn = $('#loginBtn');
+    loginBtn.text('Authenticating...');
+    
+    // Simulate OAuth delay
+    setTimeout(() => {
+        sessionStorage.setItem('videolab_session', 'active');
+        sessionStorage.setItem('videolab_user', 'demo.user@gmail.com');
+        window.location.href = 'dashboard.html';
+    }, 1000);
+}
+
+function handleLogout() {
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+}
+
+function checkAuthentication() {
+    if (sessionStorage.getItem('videolab_session') !== 'active') {
+        window.location.href = 'index.html';
+    }
+    $('#user-display').text(sessionStorage.getItem('videolab_user'));
+}
+
+/**
+ * AUTHENTICATION MOCKUP SYSTEM
+ */
+function handleLogin() {
+    const loginBtn = $('#loginBtn');
+    loginBtn.text('Authenticating...');
+    
+    // Simulate OAuth delay
+    setTimeout(() => {
+        sessionStorage.setItem('videolab_session', 'active');
+        sessionStorage.setItem('videolab_user', 'demo.user@gmail.com');
+        window.location.href = 'dashboard.html';
+    }, 1000);
+}
+
+function handleLogout() {
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+}
+
+function checkAuthentication() {
+    if (sessionStorage.getItem('videolab_session') !== 'active') {
+        window.location.href = 'index.html';
+    }
+    $('#user-display').text(sessionStorage.getItem('videolab_user'));
+}
+
+/**
+ * FILE EXPLORER SYSTEM
+ */
+let masterCatalog = [];
+
+async function initializeDashboard() {
+    checkAuthentication();
+    try {
+        const response = await fetch('catalog.json');
+        masterCatalog = await response.json();
+        renderExplorer(masterCatalog, "Home");
+    } catch (error) {
+        console.error("Failed to load catalog:", error);
+    }
+}
+
+function renderExplorer(items, folderName) {
+    const grid = $('#explorer-grid');
+    grid.empty();
+    $('#current-folder-name').text(folderName);
+
+    // Add "Back" button if not in root
+    if (folderName !== "Home") {
+        const backBtn = $(`
+            <div class="project-card folder-up">
+                <div class="card-icon">⬅️</div>
+                <div class="card-content"><h3>Back to Main</h3></div>
+            </div>
+        `).click(() => renderExplorer(masterCatalog, "Home"));
+        grid.append(backBtn);
+    }
+
+    items.forEach(item => {
+        const card = $(`
+            <div class="project-card ${item.type === 'folder' ? 'is-folder' : 'is-file'}">
+                <div class="card-icon">${item.type === 'folder' ? '📁' : '📄'}</div>
+                <div class="card-content">
+                    <h3>${item.name}</h3>
+                    <p>${item.type === 'folder' ? item.children.length + ' items' : 'Date: ' + item.date}</p>
+                </div>
+            </div>
+        `);
+
+        if (item.type === 'folder') {
+            card.click(() => renderExplorer(item.children, item.name));
+        } else {
+            card.click(() => window.location.href = `analysis.html?src=${item.path}`);
+        }
+        grid.append(card);
+    });
+}
+
+
+
+
 let player; // Dichiarazione globale
 let table, currentVideoId = "", allData = [], selectedRowIdx = null;
 const plyrConfig = { invertTime: false, displayDuration: true, controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'] };

@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Stagione 2026",
+    "type": "folder",
+    "children": [
+      {
+        "name": "Funchal 2026 EC",
+        "type": "folder",
+        "children": [
+          { "name": "Final: Team A vs Team B", "type": "file", "path": "analysis_01.json", "date": "2026-02-05" }
+        ]
+      }
+    ]
+  },
+  { "name": "Individual Scouting", "type": "file", "path": "scouting_player1.json", "date": "2026-02-01" }
+]

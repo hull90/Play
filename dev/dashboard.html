@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Video Lab</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body" onload="initializeDashboard()">
+    <nav class="top-nav">
+        <div class="nav-left">
+            <h1>VIDEO<b>LAB</b> | Dashboard</h1>
+        </div>
+        <div class="nav-right" style="margin-left:auto; display:flex; align-items:center; gap:15px;">
+            <span id="user-display" style="font-size:0.8rem; color:#94a3b8;"></span>
+            <button class="btn-icon" onclick="handleLogout()" title="Logout">Logout 🚪</button>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <h2 id="current-folder-name">Projects</h2>
+            <nav id="breadcrumb" class="breadcrumb"></nav>
+        </div>
+        
+        <div id="explorer-grid" class="project-grid">
+            </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
