@@ -65,37 +65,64 @@ async function initializeDashboard() {
     }
 }
 
+/**
+ * Renders the file explorer UI based on the provided items.
+ * @param {Array} items - Array of folder or file objects from catalog.json
+ * @param {string} folderName - The name of the current directory being viewed
+ */
 function renderExplorer(items, folderName) {
     const grid = $('#explorer-grid');
     grid.empty();
     $('#current-folder-name').text(folderName);
 
-    // Add "Back" button if not in root
+    // --- NAVIGATION: BACK BUTTON ---
+    // If we are not at the root level, add a card to go back
     if (folderName !== "Home") {
         const backBtn = $(`
-            <div class="project-card folder-up">
+            <div class="project-card folder-up" style="border-style: dashed; opacity: 0.8;">
                 <div class="card-icon">⬅️</div>
-                <div class="card-content"><h3>Back to Main</h3></div>
+                <div class="card-content">
+                    <h3>Back to Main</h3>
+                    <p>Return to root directory</p>
+                </div>
             </div>
         `).click(() => renderExplorer(masterCatalog, "Home"));
         grid.append(backBtn);
     }
 
+    // --- ITEM RENDERING ---
     items.forEach(item => {
+        // FALLBACK LOGIC: If name is missing, extract filename from path
+        let displayName = item.name;
+        if (!displayName || displayName.trim() === "") {
+            if (item.type === 'file' && item.path) {
+                // Extracts "filename.ext" from "path/to/filename.ext"
+                displayName = item.path.split('/').pop();
+            } else {
+                displayName = "Unnamed " + item.type;
+            }
+        }
+        // Inside items.forEach loop in renderExplorer function:
+        const relativeDate = getRelativeTime(item.date);
         const card = $(`
             <div class="project-card ${item.type === 'folder' ? 'is-folder' : 'is-file'}">
                 <div class="card-icon">${item.type === 'folder' ? '📁' : '📄'}</div>
                 <div class="card-content">
-                    <h3>${item.name}</h3>
-                    <p>${item.type === 'folder' ? item.children.length + ' items' : 'Date: ' + item.date}</p>
+                    <h3>${displayName}</h3>
+                    <p>${item.type === 'folder' ? item.children.length + ' items' : '' + (relativeDate || '')}</p>
                 </div>
             </div>
         `);
 
+        // --- INTERACTION LOGIC ---
         if (item.type === 'folder') {
-            card.click(() => renderExplorer(item.children, item.name));
+            // If it's a folder, click to dive into its children
+            card.click(() => renderExplorer(item.children, item.name || "Subfolder"));
         } else {
-            card.click(() => window.location.href = `analysis.html?src=${item.path}`);
+            // If it's a file, redirect to the analysis page with the src parameter
+            card.click(() => {
+                window.location.href = `analysis.html?src=${encodeURIComponent(item.path)}`;
+            });
         }
         grid.append(card);
     });
@@ -380,8 +407,47 @@ function showRowDetails() {
 
 
 
+
+
+/**
+ * Converts a date string into a relative time string (e.g., "2 days ago")
+ * @param {string} dateString - The date to convert
+ * @returns {string} - Formatted relative time
+ */
+function getRelativeTime(dateString) {
+    if (!dateString) return "N/A";
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.round((date - now) / 1000);
+    
+    // Array of time units in seconds
+    const units = [
+        { name: 'year',   seconds: 31536000 },
+        { name: 'month',  seconds: 2592000 },
+        { name: 'week',   seconds: 604800 },
+        { name: 'day',    seconds: 86400 },
+        { name: 'hour',   seconds: 3600 },
+        { name: 'minute', seconds: 60 },
+        { name: 'second', seconds: 1 }
+    ];
+
+    for (const unit of units) {
+        if (Math.abs(diffInSeconds) >= unit.seconds || unit.name === 'second') {
+            const count = Math.round(diffInSeconds / unit.seconds);
+            // "auto" uses "yesterday" or "today" instead of "1 day ago"
+            const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+            return rtf.format(count, unit.name);
+        }
+    }
+}
+
+
+
 function toggleMobileMenu(e) { e.stopPropagation(); $('#navMenu').toggleClass('open'); }
 function toggleModal(id, show) { $(`#${id}`).css('display', show ? 'block' : 'none'); }
 $(window).on('click', e => { if (!$(e.target).closest('.nav-right').length) $('#navMenu').removeClass('open'); if ($(e.target).hasClass('modal')) $('.modal').hide(); });
 $(window).on('resize', () => { if (table) table.columns.adjust(); if ($(window).width() > 991) $('#navMenu').removeClass('open'); });
 $(document).ready(init);
+
+

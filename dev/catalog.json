@@ -7,10 +7,56 @@
         "name": "Funchal 2026 EC",
         "type": "folder",
         "children": [
-          { "name": "Final: Team A vs Team B", "type": "file", "path": "analysis_01.json", "date": "2026-02-05" }
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY2_C_ITA_SRB.json",
+            "date": "2026-01-27"
+          },
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY2_C_ITA_TUR.msw",
+            "date": "2026-01-27"
+          },
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY4_E_GRE_ITA-yt.msw",
+            "date": "2026-01-29"
+          },
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY7_E_ITA_FRA-yt.msw",
+            "date": "2026-02-01"
+          },
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY7_F_NED_ESP-yt.msw",
+            "date": "2026-02-01"
+          },
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY9_SEMI_NED_ITA-yt.msw",
+            "date": "2026-02-03"
+          },
+          {
+            "name": "",
+            "type": "file",
+            "path": "Stagione 2026/Funchal 2026 EC/DAY11_BRONZE_GRE_ITA-yt.msw",
+            "date": "2026-02-05"
+          }
         ]
       }
     ]
   },
-  { "name": "Individual Scouting", "type": "file", "path": "tet.json", "date": "2026-02-01" }
+  {
+    "name": "Individual Scouting",
+    "type": "file",
+    "path": "tet.json",
+    "date": "2026-02-01"
+  }
 ]

@@ -335,59 +335,26 @@ table.dataTable tbody tr.active-row td {
 
 
 /* --- NUOVI STILI PER DASHBOARD E LOGIN --- */
-.auth-page {
-    background: var(--dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* AUTH & EXPLORER STYLES */
+.auth-page { background: var(--dark); display: flex; align-items: center; justify-content: center; }
+.auth-container { background: white; padding: 3rem; border-radius: 1rem; text-align: center; max-width: 400px; }
+.auth-footer { margin-top: 20px; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; }
+
+.dashboard-container { padding: 80px 40px; max-width: 1200px; margin: 0 auto; }
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+
+.project-card { 
+    background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; 
+    padding: 1.5rem; display: flex; align-items: center; cursor: pointer; transition: 0.2s;
 }
+.project-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+.project-card.is-folder { border-left: 4px solid #f1c40f; }
+.project-card.is-file { border-left: 4px solid var(--primary); }
 
-.auth-container {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
-    text-align: center;
-    color: var(--dark);
-    max-width: 350px;
-}
+.card-icon { font-size: 2rem; margin-right: 1rem; }
+.card-content h3 { margin: 0; font-size: 1rem; color: var(--dark); }
+.card-content p { margin: 4px 0 0; font-size: 0.8rem; color: #64748b; }
 
-.auth-footer { font-size: 10px; color: #94a3b8; margin-top: 20px; text-transform: uppercase; }
-
-.dashboard-container {
-    padding: 80px 20px 20px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    margin-top: 30px;
-}
-
-.project-card {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: var(--dark);
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s;
-}
-
-.project-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-}
-
-.card-icon { font-size: 2rem; margin-right: 15px; }
-.card-content h3 { margin: 0; font-size: 1rem; }
-.card-content p { margin: 5px 0 0; font-size: 0.8rem; color: #64748b; }
 
 /* Aggiunta per il tasto logout nel nav */
 .nav-right { margin-left: auto; display: flex; align-items: center; }
